@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Admin Dashboard - MyMovies</title>
+    <title>MyMovies - Admin</title>
 
     <link
         rel="stylesheet"
@@ -19,27 +19,32 @@
 
 </head>
 
-
 <body>
 
+<!-- ======================================================
+     HEADER
+====================================================== -->
 
-<header class="navbar">
+<header class="topbar">
 
-    <a
-        href="{{ url_for('home') }}"
-        class="logo"
-    >
+    <div class="brand">
         🎬 MyMovies
-    </a>
+    </div>
 
-
-    <nav>
+    <nav class="nav">
 
         <a href="{{ url_for('home') }}">
             🏠 Home
         </a>
 
-        <a href="{{ url_for('logout') }}">
+        <a href="{{ url_for('admin') }}">
+            👨‍💼 Admin
+        </a>
+
+        <a
+            class="logout"
+            href="{{ url_for('logout') }}"
+        >
             🚪 Logout
         </a>
 
@@ -48,11 +53,18 @@
 </header>
 
 
+<!-- ======================================================
+     MAIN
+====================================================== -->
 
-<main class="admin-page">
+<main class="admin-container">
 
 
-    <div class="admin-header">
+    <!-- ==================================================
+         PAGE TITLE
+    ================================================== -->
+
+    <section class="admin-header">
 
         <div>
 
@@ -61,49 +73,85 @@
             </h1>
 
             <p>
-                Upload and manage your movies
+                Manage your movies and uploads.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         FLASH MESSAGES
+    ================================================== -->
+
+    {% with messages = get_flashed_messages(
+        with_categories=true
+    ) %}
+
+        {% if messages %}
+
+            <div class="messages">
+
+                {% for category, message in messages %}
+
+                    <div
+                        class="message {{ category }}"
+                    >
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- ==================================================
+         ADD MOVIE
+    ================================================== -->
+
+    <section class="admin-card">
+
+        <div class="card-title">
+
+            <h2>
+                🎬 Add New Movie
+            </h2>
+
+            <p>
+                Upload a poster and movie file.
             </p>
 
         </div>
 
 
-        <a
-            href="{{ url_for('home') }}"
-            class="secondary-button"
-        >
-            🏠 View Website
-        </a>
-
-    </div>
-
-
-
-    <!-- UPLOAD CARD -->
-
-    <section class="admin-card">
-
-        <h2>
-            🎬 Add New Movie
-        </h2>
-
-
         <form
-            id="uploadForm"
-            method="POST"
             action="{{ url_for('add_movie') }}"
+            method="POST"
             enctype="multipart/form-data"
             class="movie-form"
         >
 
 
+            <!-- ==========================================
+                 TITLE
+            =========================================== -->
+
             <div class="form-group">
 
-                <label>
-                    Movie Title *
+                <label for="title">
+                    Movie Title
                 </label>
 
                 <input
                     type="text"
+                    id="title"
                     name="title"
                     placeholder="Enter movie title"
                     required
@@ -112,263 +160,313 @@
             </div>
 
 
-            <div class="form-group">
+            <!-- ==========================================
+                 YEAR + GENRE
+            =========================================== -->
 
-                <label>
-                    Year
-                </label>
+            <div class="form-row">
 
-                <input
-                    type="text"
-                    name="year"
-                    placeholder="2026"
-                >
+                <div class="form-group">
 
-            </div>
+                    <label for="year">
+                        Year
+                    </label>
 
+                    <input
+                        type="text"
+                        id="year"
+                        name="year"
+                        placeholder="2026"
+                    >
 
-            <div class="form-group">
-
-                <label>
-                    Genre
-                </label>
-
-                <input
-                    type="text"
-                    name="genre"
-                    placeholder="Action, Comedy..."
-                >
-
-            </div>
+                </div>
 
 
-            <div class="form-group">
+                <div class="form-group">
 
-                <label>
-                    🖼️ Poster
-                </label>
+                    <label for="genre">
+                        Genre
+                    </label>
 
-                <input
-                    type="file"
-                    name="poster"
-                    id="poster"
-                    accept=".jpg,.jpeg,.png,.webp"
-                >
+                    <input
+                        type="text"
+                        id="genre"
+                        name="genre"
+                        placeholder="Action, Comedy..."
+                    >
 
-                <small id="posterName">
-                    No poster selected
-                </small>
+                </div>
 
             </div>
 
 
-            <div class="form-group full">
+            <!-- ==========================================
+                 DESCRIPTION
+            =========================================== -->
 
-                <label>
+            <div class="form-group">
+
+                <label for="description">
                     Description
                 </label>
 
                 <textarea
+                    id="description"
                     name="description"
-                    placeholder="Movie description..."
+                    rows="5"
+                    placeholder="Enter movie description..."
                 ></textarea>
 
             </div>
 
 
-            <div class="form-group full">
+            <!-- ==========================================
+                 POSTER
+            =========================================== -->
 
-                <label>
-                    🎥 Movie File *
-                </label>
+            <div class="upload-box">
 
-                <input
-                    type="file"
-                    name="movie_file"
-                    id="movieFile"
-                    accept=".mp4,.webm,.m4v,.ogg"
-                    required
-                >
+                <div class="upload-icon">
+                    🖼️
+                </div>
 
-                <small id="movieName">
-                    No movie selected
-                </small>
+                <div class="upload-content">
+
+                    <h3>
+                        Movie Poster
+                    </h3>
+
+                    <p>
+                        JPG, JPEG, PNG or WEBP
+                    </p>
+
+                    <input
+                        type="file"
+                        id="poster"
+                        name="poster"
+                        accept="image/jpeg,image/png,image/webp"
+                        required
+                    >
+
+                </div>
 
             </div>
 
 
-            <div class="form-group full">
+            <!-- ==========================================
+                 MOVIE
+            =========================================== -->
 
-                <button
-                    type="submit"
-                    id="uploadButton"
-                    class="upload-button"
-                >
-                    🎬 Upload Movie
-                </button>
+            <div class="upload-box movie-upload">
+
+                <div class="upload-icon">
+                    🎥
+                </div>
+
+                <div class="upload-content">
+
+                    <h3>
+                        Movie File
+                    </h3>
+
+                    <p>
+                        MP4, MKV, WEBM and other video files
+                    </p>
+
+                    <input
+                        type="file"
+                        id="movie_file"
+                        name="movie_file"
+                        accept="video/*"
+                        required
+                    >
+
+                </div>
 
             </div>
 
+
+            <!-- ==========================================
+                 UPLOAD BUTTON
+            =========================================== -->
+
+            <button
+                type="submit"
+                class="upload-button"
+                id="uploadButton"
+            >
+
+                ☁️ Upload Movie
+
+            </button>
+
+
+            <!-- ==========================================
+                 UPLOAD STATUS
+            =========================================== -->
+
+            <div
+                id="uploadStatus"
+                class="upload-status"
+            >
+
+            </div>
 
         </form>
-
-
-        <div class="upload-info">
-
-            <strong>Large upload:</strong>
-
-            Maximum Flask request size is 5 GB.
-
-            Large files may take a long time to upload.
-
-        </div>
 
     </section>
 
 
-
-    <!-- MOVIES -->
+    <!-- ==================================================
+         MOVIE LIST
+    ================================================== -->
 
     <section class="admin-card">
 
-        <h2>
-            📚 Uploaded Movies
-        </h2>
+        <div class="card-title">
 
-
-        {% if movies %}
-
-
-        <div class="admin-movie-list">
-
-
-            {% for movie in movies %}
-
-
-            <div class="admin-movie">
-
-
-                {% if movie['poster'] %}
-
-                <img
-                    src="{{ url_for(
-                        'serve_poster',
-                        filename=movie['poster']
-                    ) }}"
-                    alt="{{ movie['title'] }}"
-                >
-
-                {% else %}
-
-                <div class="admin-poster-placeholder">
-                    🎬
-                </div>
-
-                {% endif %}
-
-
-                <div class="admin-movie-info">
-
-                    <h3>
-                        {{ movie['title'] }}
-                    </h3>
-
-                    <p>
-
-                        {% if movie['year'] %}
-                            {{ movie['year'] }}
-                        {% endif %}
-
-                        {% if movie['genre'] %}
-                            • {{ movie['genre'] }}
-                        {% endif %}
-
-                    </p>
-
-                </div>
-
-
-                <div class="admin-movie-actions">
-
-
-                    <a
-                        href="{{ url_for(
-                            'movie_details',
-                            movie_id=movie['id']
-                        ) }}"
-                        class="view-button"
-                    >
-                        ▶ View
-                    </a>
-
-
-                    {% if movie['movie_file'] %}
-
-                    <a
-                        href="{{ url_for(
-                            'serve_video',
-                            filename=movie['movie_file']
-                        ) }}"
-                        class="download-button"
-                        download
-                    >
-                        ⬇ Download
-                    </a>
-
-                    {% endif %}
-
-
-                    <form
-                        method="POST"
-                        action="{{ url_for(
-                            'delete_movie',
-                            movie_id=movie['id']
-                        ) }}"
-                        onsubmit="return confirm(
-                            'Delete this movie?'
-                        );"
-                    >
-
-                        <button
-                            type="submit"
-                            class="delete-button"
-                        >
-                            🗑 Delete
-                        </button>
-
-                    </form>
-
-
-                </div>
-
-            </div>
-
-
-            {% endfor %}
-
-
-        </div>
-
-
-        {% else %}
-
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                🎬
-            </div>
-
-            <h3>
-                No movies uploaded
-            </h3>
+            <h2>
+                🎞️ Your Movies
+            </h2>
 
             <p>
-                Upload your first movie above.
+                Movies currently stored in your database.
             </p>
 
         </div>
 
+
+        {% if movies %}
+
+            <div class="movie-admin-list">
+
+                {% for movie in movies %}
+
+                    <div class="movie-admin-item">
+
+
+                        <!-- POSTER -->
+
+                        <div class="admin-poster">
+
+                            {% if movie.drive_poster_id %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'poster',
+                                        movie_id=movie.id
+                                    ) }}"
+                                    alt="{{ movie.title }}"
+                                >
+
+                            {% else %}
+
+                                <div class="no-poster">
+                                    🎬
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- DETAILS -->
+
+                        <div class="admin-movie-info">
+
+                            <h3>
+                                {{ movie.title }}
+                            </h3>
+
+                            <p>
+
+                                {% if movie.year %}
+                                    📅 {{ movie.year }}
+                                {% endif %}
+
+                                {% if movie.genre %}
+                                    &nbsp; • &nbsp;
+                                    🎭 {{ movie.genre }}
+                                {% endif %}
+
+                            </p>
+
+                            {% if movie.description %}
+
+                                <p class="description">
+
+                                    {{ movie.description }}
+
+                                </p>
+
+                            {% endif %}
+
+                            <a
+                                href="{{ url_for(
+                                    'movie',
+                                    movie_id=movie.id
+                                ) }}"
+                                class="view-button"
+                            >
+
+                                ▶️ View Movie
+
+                            </a>
+
+                        </div>
+
+
+                        <!-- DELETE -->
+
+                        <div class="admin-actions">
+
+                            <form
+                                action="{{ url_for(
+                                    'delete_movie',
+                                    movie_id=movie.id
+                                ) }}"
+                                method="POST"
+                                onsubmit="return confirm(
+                                    'Delete this movie?'
+                                );"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="delete-button"
+                                >
+
+                                    🗑️ Delete
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div>
+                    🎬
+                </div>
+
+                <h3>
+                    No movies yet
+                </h3>
+
+                <p>
+                    Upload your first movie above.
+                </p>
+
+            </div>
 
         {% endif %}
 
@@ -378,102 +476,118 @@
 </main>
 
 
-
-<footer>
-
-    <p>
-        © 2026 MyMovies Admin
-    </p>
-
-</footer>
-
-
+<!-- ======================================================
+     JAVASCRIPT
+====================================================== -->
 
 <script>
 
-const poster =
-    document.getElementById("poster");
-
-const movieFile =
-    document.getElementById("movieFile");
-
-const posterName =
-    document.getElementById("posterName");
-
-const movieName =
-    document.getElementById("movieName");
-
-const uploadForm =
-    document.getElementById("uploadForm");
+const form = document.querySelector(".movie-form");
 
 const uploadButton =
     document.getElementById("uploadButton");
 
+const uploadStatus =
+    document.getElementById("uploadStatus");
 
-poster.addEventListener(
-    "change",
-    function () {
+const movieInput =
+    document.getElementById("movie_file");
 
-        if (this.files.length > 0) {
-
-            posterName.textContent =
-                this.files[0].name;
-
-        } else {
-
-            posterName.textContent =
-                "No poster selected";
-
-        }
-
-    }
-);
+const posterInput =
+    document.getElementById("poster");
 
 
-movieFile.addEventListener(
-    "change",
-    function () {
+if (form) {
 
-        if (this.files.length > 0) {
+    form.addEventListener(
+        "submit",
+        function () {
 
-            const file =
-                this.files[0];
+            uploadButton.disabled = true;
 
-            const gb =
-                file.size /
-                (1024 * 1024 * 1024);
+            uploadButton.innerHTML =
+                "⏳ Uploading...";
 
-            movieName.textContent =
-                file.name +
-                " — " +
-                gb.toFixed(2) +
-                " GB";
-
-        } else {
-
-            movieName.textContent =
-                "No movie selected";
+            uploadStatus.innerHTML =
+                "Please wait. Do not close this page while the files are uploading.";
 
         }
+    );
 
-    }
-);
+}
 
 
-uploadForm.addEventListener(
-    "submit",
-    function () {
+if (movieInput) {
 
-        uploadButton.disabled = true;
+    movieInput.addEventListener(
+        "change",
+        function () {
 
-        uploadButton.textContent =
-            "⏳ Uploading... Please wait";
+            if (
+                movieInput.files &&
+                movieInput.files.length > 0
+            ) {
 
-    }
-);
+                const file =
+                    movieInput.files[0];
+
+                const sizeGB =
+                    file.size /
+                    (1024 * 1024 * 1024);
+
+                if (sizeGB >= 1) {
+
+                    uploadStatus.innerHTML =
+                        "🎥 Selected movie: " +
+                        sizeGB.toFixed(2) +
+                        " GB";
+
+                } else {
+
+                    const sizeMB =
+                        file.size /
+                        (1024 * 1024);
+
+                    uploadStatus.innerHTML =
+                        "🎥 Selected movie: " +
+                        sizeMB.toFixed(1) +
+                        " MB";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+if (posterInput) {
+
+    posterInput.addEventListener(
+        "change",
+        function () {
+
+            if (
+                posterInput.files &&
+                posterInput.files.length > 0
+            ) {
+
+                uploadStatus.innerHTML =
+                    "🖼️ Poster selected: " +
+                    posterInput.files[0].name;
+
+            }
+
+        }
+    );
+
+}
 
 </script>
 
 
 </body>
+
 </html>
