@@ -1,122 +1,35 @@
-{% extends "base.html" %}
+{% if movie['movie_file'] %}
 
-{% block title %}
+<div class="video-section">
 
-{{ movie['title'] }} - MyMovies
-
-{% endblock %}
-
-
-{% block content %}
-
-<main class="movie-page">
-
-
-    <a
-        href="{{ url_for('home') }}"
-        class="back-button">
-
-        ← Back to Movies
-
-    </a>
-
-
-
-    {% if movie['movie_file'] %}
+    <h2>▶ Watch Movie</h2>
 
     <div class="video-container">
 
         <video
+            class="video-player"
             controls
-            preload="metadata">
+            preload="metadata"
+        >
 
             <source
                 src="{{ url_for(
-                    'video',
+                    'serve_video',
                     filename=movie['movie_file']
-                ) }}">
+                ) }}"
+                type="video/mp4"
+            >
 
-            Your browser does not support
-            video playback.
+            Your browser does not support video playback.
 
         </video>
 
     </div>
 
-    {% else %}
+</div>
 
-    <div class="no-video">
+{% else %}
 
-        <div>
-            🎬
-        </div>
+<p>No movie file has been uploaded.</p>
 
-        <h2>
-            Video not available
-        </h2>
-
-        <p>
-            No movie file has been uploaded.
-        </p>
-
-    </div>
-
-    {% endif %}
-
-
-
-    <section class="movie-details">
-
-        <span class="movie-badge">
-            MOVIE
-        </span>
-
-
-        <h1>
-            {{ movie['title'] }}
-        </h1>
-
-
-        <div class="movie-meta">
-
-            {% if movie['year'] %}
-
-            <span>
-                {{ movie['year'] }}
-            </span>
-
-            {% endif %}
-
-
-            {% if movie['genre'] %}
-
-            <span>
-                • {{ movie['genre'] }}
-            </span>
-
-            {% endif %}
-
-        </div>
-
-
-        <p class="movie-description">
-
-            {% if movie['description'] %}
-
-                {{ movie['description'] }}
-
-            {% else %}
-
-                No description available.
-
-            {% endif %}
-
-        </p>
-
-
-    </section>
-
-
-</main>
-
-{% endblock %}
+{% endif %}
