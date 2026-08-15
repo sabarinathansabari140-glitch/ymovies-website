@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+MyMovies - Home
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-tag">
+            YOUR MOVIE LIBRARY
+        </div>
+
+        <h1>
+            Watch your movies
+            in one place.
+        </h1>
+
+        <p>
+            Browse your personal movie collection,
+            search for movies and play your uploaded
+            videos directly in your browser.
+        </p>
+
+        <a
+            href="#movies"
+            class="primary-button">
+
+            Browse Movies
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<section class="search-area">
+
+    <form
+        class="search-form"
+        method="GET"
+        action="{{ url_for('home') }}">
+
+        <div class="search-input">
+
+            🔎
+
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="Search movies...">
+
+        </div>
+
+
+        <button type="submit">
+
+            Search
+
+        </button>
+
+    </form>
+
+</section>
+
+
+
+<main
+    class="main"
+    id="movies">
+
+
+    <div class="title-row">
+
+        <small>
+            MOVIE COLLECTION
+        </small>
+
+        <h2>
+            {% if search %}
+
+                Search Results
+
+            {% else %}
+
+                Latest Movies
+
+            {% endif %}
+        </h2>
+
+    </div>
+
+
+
+    {% if movies %}
+
+    <div class="movies">
+
+        {% for movie in movies %}
+
+        <article class="movie-card">
+
+
+            <a
+                href="{{ url_for(
+                    'movie_details',
+                    movie_id=movie['id']
+                ) }}"
+                class="poster">
+
+
+                {% if movie['poster'] %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='uploads/posters/' +
+                        movie['poster']
+                    ) }}"
+                    alt="{{ movie['title'] }}">
+
+                {% else %}
+
+                <div class="no-poster">
+                    🎬
+                </div>
+
+                {% endif %}
+
+
+                <div class="poster-hover">
+
+                    <div class="play">
+                        ▶
+                    </div>
+
+                    <span>
+                        View Movie
+                    </span>
+
+                </div>
+
+
+            </a>
+
+
+            <div class="movie-content">
+
+                <h3>
+                    {{ movie['title'] }}
+                </h3>
+
+
+                <div class="info">
+
+                    {% if movie['year'] %}
+
+                    <span>
+                        {{ movie['year'] }}
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if movie['genre'] %}
+
+                    <span>
+                        •
+                        {{ movie['genre'] }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <p>
+
+                    {% if movie['description'] %}
+
+                        {{ movie['description'] }}
+
+                    {% else %}
+
+                        No description available.
+
+                    {% endif %}
+
+                </p>
+
+
+                <div class="actions">
+
+                    <a
+                        href="{{ url_for(
+                            'movie_details',
+                            movie_id=movie['id']
+                        ) }}"
+                        class="watch">
+
+                        ▶ Watch
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty">
+
+        <div>
+            🎬
+        </div>
+
+        <h3>
+            No movies found
+        </h3>
+
+        <p>
+
+            {% if search %}
+
+                No movie matches
+                "{{ search }}".
+
+            {% else %}
+
+                Your movie library is empty.
+
+            {% endif %}
+
+        </p>
+
+        {% if search %}
+
+        <a href="{{ url_for('home') }}">
+
+            Show all movies
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+    {% endif %}
+
+
+</main>
+
+
+{% endblock %}

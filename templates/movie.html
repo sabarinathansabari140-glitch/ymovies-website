@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{{ movie['title'] }} - MyMovies
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="movie-page">
+
+
+    <a
+        href="{{ url_for('home') }}"
+        class="back-button">
+
+        ← Back to Movies
+
+    </a>
+
+
+
+    {% if movie['movie_file'] %}
+
+    <div class="video-container">
+
+        <video
+            controls
+            preload="metadata">
+
+            <source
+                src="{{ url_for(
+                    'video',
+                    filename=movie['movie_file']
+                ) }}">
+
+            Your browser does not support
+            video playback.
+
+        </video>
+
+    </div>
+
+    {% else %}
+
+    <div class="no-video">
+
+        <div>
+            🎬
+        </div>
+
+        <h2>
+            Video not available
+        </h2>
+
+        <p>
+            No movie file has been uploaded.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+
+    <section class="movie-details">
+
+        <span class="movie-badge">
+            MOVIE
+        </span>
+
+
+        <h1>
+            {{ movie['title'] }}
+        </h1>
+
+
+        <div class="movie-meta">
+
+            {% if movie['year'] %}
+
+            <span>
+                {{ movie['year'] }}
+            </span>
+
+            {% endif %}
+
+
+            {% if movie['genre'] %}
+
+            <span>
+                • {{ movie['genre'] }}
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <p class="movie-description">
+
+            {% if movie['description'] %}
+
+                {{ movie['description'] }}
+
+            {% else %}
+
+                No description available.
+
+            {% endif %}
+
+        </p>
+
+
+    </section>
+
+
+</main>
+
+{% endblock %}

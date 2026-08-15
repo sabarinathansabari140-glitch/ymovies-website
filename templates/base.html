@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}MyMovies{% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="header-inner">
+
+        <a href="{{ url_for('home') }}"
+           class="logo">
+
+            🎬 MyMovies
+
+        </a>
+
+
+        <nav class="nav">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            {% if session.get('admin_logged_in') %}
+
+                <a href="{{ url_for('admin') }}">
+                    Admin
+                </a>
+
+                <a href="{{ url_for('logout') }}">
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a href="{{ url_for('login') }}">
+                    Admin
+                </a>
+
+            {% endif %}
+
+            <button
+                id="themeButton"
+                class="theme-button"
+                type="button">
+
+                🌙
+
+            </button>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+{% block content %}
+
+{% endblock %}
+
+
+<footer>
+
+    <div class="footer-logo">
+        🎬 MyMovies
+    </div>
+
+    <p>
+        Your personal movie library
+    </p>
+
+</footer>
+
+
+<script>
+
+const themeButton =
+    document.getElementById("themeButton");
+
+const savedTheme =
+    localStorage.getItem("theme");
+
+
+if (savedTheme === "dark") {
+
+    document.body.classList.add("dark");
+
+    themeButton.textContent = "☀️";
+
+}
+
+
+themeButton.addEventListener(
+    "click",
+    function () {
+
+        document.body.classList.toggle(
+            "dark"
+        );
+
+        const dark =
+            document.body.classList.contains(
+                "dark"
+            );
+
+        if (dark) {
+
+            localStorage.setItem(
+                "theme",
+                "dark"
+            );
+
+            themeButton.textContent = "☀️";
+
+        } else {
+
+            localStorage.setItem(
+                "theme",
+                "light"
+            );
+
+            themeButton.textContent = "🌙";
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

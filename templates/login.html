@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Admin Login - MyMovies
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="login-page">
+
+    <div class="login-box">
+
+        <div class="login-icon">
+            🔐
+        </div>
+
+        <div class="login-title">
+
+            <small>
+                ADMIN AREA
+            </small>
+
+            <h1>
+                Admin Login
+            </h1>
+
+            <p>
+                Sign in to manage your movies.
+            </p>
+
+        </div>
+
+
+        <form
+            class="login-form"
+            method="POST">
+
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Enter username"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required>
+
+            </div>
+
+
+            <button
+                class="login-button"
+                type="submit">
+
+                Login
+
+            </button>
+
+
+        </form>
+
+
+        {% if error %}
+
+        <div class="login-error">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+        <a
+            href="{{ url_for('home') }}"
+            class="login-back">
+
+            ← Back to Home
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

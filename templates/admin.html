@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Admin - MyMovies
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="admin-page">
+
+
+    <div class="admin-title">
+
+        <small>
+            ADMIN PANEL
+        </small>
+
+        <h1>
+            Movie Management
+        </h1>
+
+        <p>
+            Add posters and movie files
+            to your library.
+        </p>
+
+    </div>
+
+
+
+    <div class="movie-form">
+
+        <form
+            action="{{ url_for('add_movie') }}"
+            method="POST"
+            enctype="multipart/form-data">
+
+
+            <div class="form-row">
+
+
+                <div class="form-group">
+
+                    <label>
+                        Movie Title
+                    </label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="Movie title"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Year
+                    </label>
+
+                    <input
+                        type="number"
+                        name="year"
+                        placeholder="2026">
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Genre
+                </label>
+
+                <input
+                    type="text"
+                    name="genre"
+                    placeholder="Action, Comedy, Drama">
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    name="description"
+                    placeholder="Movie description"></textarea>
+
+            </div>
+
+
+
+            <div class="form-group file-group">
+
+                <label>
+                    Movie Poster
+                </label>
+
+                <input
+                    type="file"
+                    name="poster"
+                    accept="image/*">
+
+                <span class="help">
+                    JPG, PNG or WEBP
+                </span>
+
+            </div>
+
+
+
+            <div class="form-group file-group">
+
+                <label>
+                    Movie Video
+                </label>
+
+                <input
+                    type="file"
+                    name="movie_file"
+                    accept="video/*">
+
+                <span class="help">
+                    MP4, WEBM, OGG or MOV
+                </span>
+
+            </div>
+
+
+
+            <div class="form-buttons">
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="cancel-button">
+
+                    Cancel
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="save-button">
+
+                    ➕ Add Movie
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+
+    <section class="admin-list">
+
+        <h2>
+            Your Movies
+        </h2>
+
+
+        {% if movies %}
+
+
+            {% for movie in movies %}
+
+            <div class="admin-movie">
+
+
+                <div class="admin-movie-info">
+
+
+                    {% if movie['poster'] %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='uploads/posters/' +
+                            movie['poster']
+                        ) }}"
+                        alt="{{ movie['title'] }}">
+
+                    {% else %}
+
+                    <div class="admin-no-poster">
+                        🎬
+                    </div>
+
+                    {% endif %}
+
+
+                    <div>
+
+                        <h3>
+                            {{ movie['title'] }}
+                        </h3>
+
+                        <p>
+
+                            {{ movie['year'] }}
+
+                            {% if movie['genre'] %}
+
+                            • {{ movie['genre'] }}
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    action="{{ url_for(
+                        'delete_movie',
+                        movie_id=movie['id']
+                    ) }}"
+                    method="POST"
+                    onsubmit="return confirm(
+                        'Delete this movie?'
+                    );">
+
+                    <button
+                        type="submit"
+                        class="delete-button">
+
+                        Delete
+
+                    </button>
+
+                </form>
+
+
+            </div>
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+        <div class="empty">
+
+            <div>
+                🎬
+            </div>
+
+            <h3>
+                No movies yet
+            </h3>
+
+            <p>
+                Add your first movie above.
+            </p>
+
+        </div>
+
+
+        {% endif %}
+
+
+    </section>
+
+
+</main>
+
+{% endblock %}
