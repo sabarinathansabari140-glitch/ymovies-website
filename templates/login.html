@@ -45,8 +45,7 @@
 
 
 
-<main class="login-container">
-
+<main class="login-page">
 
     <div class="login-card">
 
@@ -61,7 +60,7 @@
         </h1>
 
 
-        <p class="login-subtitle">
+        <p>
             Sign in to manage your movies
         </p>
 
@@ -81,34 +80,30 @@
         >
 
 
-            <label for="username">
+            <label>
                 Username
             </label>
 
             <input
-                id="username"
                 type="text"
                 name="username"
-                placeholder="Enter username"
+                placeholder="Username"
                 autocomplete="username"
                 required
             >
 
 
-
-            <label for="password">
+            <label>
                 Password
             </label>
 
             <input
-                id="password"
                 type="password"
                 name="password"
-                placeholder="Enter password"
+                placeholder="Password"
                 autocomplete="current-password"
                 required
             >
-
 
 
             <button
@@ -124,7 +119,7 @@
 
         <a
             href="{{ url_for('home') }}"
-            class="back-home"
+            class="back-link"
         >
             ← Back to Home
         </a>
@@ -132,8 +127,8 @@
 
     </div>
 
-
 </main>
+
 
 
 <footer>

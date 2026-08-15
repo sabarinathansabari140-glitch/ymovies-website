@@ -1,22 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>MyMovies</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
 </head>
+
 
 <body>
 
+
 <header class="navbar">
 
-    <a href="{{ url_for('home') }}" class="logo">
+    <a
+        href="{{ url_for('home') }}"
+        class="logo"
+    >
         🎬 MyMovies
     </a>
+
 
     <nav>
 
@@ -33,11 +48,14 @@
 </header>
 
 
+
 <section class="hero">
 
     <div class="container">
 
-        <h1>Welcome to MyMovies</h1>
+        <h1>
+            Welcome to MyMovies
+        </h1>
 
         <p>
             Search and watch your movie collection
@@ -45,9 +63,9 @@
 
 
         <form
-            class="search-box"
             method="GET"
             action="{{ url_for('home') }}"
+            class="search-box"
         >
 
             <input
@@ -68,7 +86,8 @@
 </section>
 
 
-<main class="movies-section">
+
+<main class="container movies-section">
 
     {% if search %}
 
@@ -85,6 +104,7 @@
     {% endif %}
 
 
+
     {% if movies %}
 
         <div class="movie-grid">
@@ -93,10 +113,13 @@
 
             <article class="movie-card">
 
-                <a href="{{ url_for(
-                    'movie_details',
-                    movie_id=movie['id']
-                ) }}">
+
+                <a
+                    href="{{ url_for(
+                        'movie_details',
+                        movie_id=movie['id']
+                    ) }}"
+                >
 
                     {% if movie['poster'] %}
 
@@ -129,28 +152,18 @@
                     <div class="movie-meta">
 
                         {% if movie['year'] %}
-                        <span>
-                            📅 {{ movie['year'] }}
-                        </span>
+                            <span>
+                                📅 {{ movie['year'] }}
+                            </span>
                         {% endif %}
 
-
                         {% if movie['genre'] %}
-                        <span>
-                            🎭 {{ movie['genre'] }}
-                        </span>
+                            <span>
+                                🎭 {{ movie['genre'] }}
+                            </span>
                         {% endif %}
 
                     </div>
-
-
-                    {% if movie['description'] %}
-
-                    <p>
-                        {{ movie['description'] }}
-                    </p>
-
-                    {% endif %}
 
 
                     <a
@@ -171,6 +184,7 @@
 
         </div>
 
+
     {% else %}
 
         <div class="empty">
@@ -183,33 +197,20 @@
                 No movies found
             </h3>
 
-            {% if search %}
-
             <p>
-                Try another search.
+                {% if search %}
+                    Try another search.
+                {% else %}
+                    Your movie collection is empty.
+                {% endif %}
             </p>
-
-            <a href="{{ url_for('home') }}">
-                Show All Movies
-            </a>
-
-            {% else %}
-
-            <p>
-                Your movie collection is empty.
-            </p>
-
-            <a href="{{ url_for('login') }}">
-                🔐 Admin Login
-            </a>
-
-            {% endif %}
 
         </div>
 
     {% endif %}
 
 </main>
+
 
 
 <footer>
@@ -219,6 +220,7 @@
     </p>
 
 </footer>
+
 
 </body>
 </html>

@@ -1,35 +1,193 @@
-{% if movie['movie_file'] %}
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="video-section">
+<head>
 
-    <h2>▶ Watch Movie</h2>
+    <meta charset="UTF-8">
 
-    <div class="video-container">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-        <video
-            class="video-player"
-            controls
-            preload="metadata"
+    <title>
+        {{ movie['title'] }} - MyMovies
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <a
+        href="{{ url_for('home') }}"
+        class="logo"
+    >
+        🎬 MyMovies
+    </a>
+
+
+    <nav>
+
+        <a href="{{ url_for('home') }}">
+            🏠 Home
+        </a>
+
+        {% if session.get('admin_logged_in') %}
+
+        <a href="{{ url_for('admin') }}">
+            👨‍💼 Admin
+        </a>
+
+        {% else %}
+
+        <a href="{{ url_for('login') }}">
+            🔐 Admin
+        </a>
+
+        {% endif %}
+
+    </nav>
+
+</header>
+
+
+
+<main class="watch-page">
+
+
+    <div class="watch-container">
+
+
+        <a
+            href="{{ url_for('home') }}"
+            class="back-link"
         >
+            ← Back to Movies
+        </a>
 
-            <source
-                src="{{ url_for(
+
+        <h1>
+            {{ movie['title'] }}
+        </h1>
+
+
+        <div class="watch-meta">
+
+            {% if movie['year'] %}
+                <span>
+                    📅 {{ movie['year'] }}
+                </span>
+            {% endif %}
+
+            {% if movie['genre'] %}
+                <span>
+                    🎭 {{ movie['genre'] }}
+                </span>
+            {% endif %}
+
+        </div>
+
+
+
+        {% if movie['movie_file'] %}
+
+
+        <div class="video-container">
+
+            <video
+                controls
+                preload="metadata"
+                playsinline
+            >
+
+                <source
+                    src="{{ url_for(
+                        'serve_video',
+                        filename=movie['movie_file']
+                    ) }}"
+                >
+
+                Your browser does not support HTML5 video.
+
+            </video>
+
+        </div>
+
+
+        <div class="video-actions">
+
+            <a
+                href="{{ url_for(
                     'serve_video',
                     filename=movie['movie_file']
                 ) }}"
-                type="video/mp4"
+                class="download-button large"
+                download
             >
+                ⬇ Download Movie
+            </a>
 
-            Your browser does not support video playback.
+        </div>
 
-        </video>
+
+        {% else %}
+
+
+        <div class="no-video">
+
+            🎥
+
+            <h2>
+                Movie file not available
+            </h2>
+
+        </div>
+
+
+        {% endif %}
+
+
+
+        {% if movie['description'] %}
+
+        <section class="description">
+
+            <h2>
+                About this movie
+            </h2>
+
+            <p>
+                {{ movie['description'] }}
+            </p>
+
+        </section>
+
+        {% endif %}
+
 
     </div>
 
-</div>
+</main>
 
-{% else %}
 
-<p>No movie file has been uploaded.</p>
 
-{% endif %}
+<footer>
+
+    <p>
+        © 2026 MyMovies
+    </p>
+
+</footer>
+
+
+</body>
+</html>

@@ -48,12 +48,11 @@
 </header>
 
 
-<main class="admin-container">
+
+<main class="admin-page">
 
 
-    <!-- ADMIN HEADER -->
-
-    <section class="admin-header">
+    <div class="admin-header">
 
         <div>
 
@@ -62,35 +61,24 @@
             </h1>
 
             <p>
-                Add and manage your movies
+                Upload and manage your movies
             </p>
 
         </div>
 
 
-        <div class="admin-actions">
+        <a
+            href="{{ url_for('home') }}"
+            class="secondary-button"
+        >
+            🏠 View Website
+        </a>
 
-            <a
-                href="{{ url_for('home') }}"
-                class="secondary-button"
-            >
-                🏠 View Website
-            </a>
-
-            <a
-                href="{{ url_for('logout') }}"
-                class="secondary-button"
-            >
-                🚪 Logout
-            </a>
-
-        </div>
-
-    </section>
+    </div>
 
 
 
-    <!-- UPLOAD MOVIE -->
+    <!-- UPLOAD CARD -->
 
     <section class="admin-card">
 
@@ -100,23 +88,21 @@
 
 
         <form
-            class="movie-form"
+            id="uploadForm"
             method="POST"
             action="{{ url_for('add_movie') }}"
             enctype="multipart/form-data"
+            class="movie-form"
         >
 
 
-            <!-- TITLE -->
-
             <div class="form-group">
 
-                <label for="title">
+                <label>
                     Movie Title *
                 </label>
 
                 <input
-                    id="title"
                     type="text"
                     name="title"
                     placeholder="Enter movie title"
@@ -126,17 +112,13 @@
             </div>
 
 
-
-            <!-- YEAR -->
-
             <div class="form-group">
 
-                <label for="year">
+                <label>
                     Year
                 </label>
 
                 <input
-                    id="year"
                     type="text"
                     name="year"
                     placeholder="2026"
@@ -145,17 +127,13 @@
             </div>
 
 
-
-            <!-- GENRE -->
-
             <div class="form-group">
 
-                <label for="genre">
+                <label>
                     Genre
                 </label>
 
                 <input
-                    id="genre"
                     type="text"
                     name="genre"
                     placeholder="Action, Comedy..."
@@ -164,78 +142,67 @@
             </div>
 
 
-
-            <!-- POSTER -->
-
             <div class="form-group">
 
-                <label for="poster">
-                    🖼️ Movie Poster
+                <label>
+                    🖼️ Poster
                 </label>
 
                 <input
-                    id="poster"
                     type="file"
                     name="poster"
+                    id="poster"
                     accept=".jpg,.jpeg,.png,.webp"
                 >
 
-                <span class="form-help">
-                    JPG, PNG or WEBP
-                </span>
+                <small id="posterName">
+                    No poster selected
+                </small>
 
             </div>
 
 
-
-            <!-- DESCRIPTION -->
-
             <div class="form-group full">
 
-                <label for="description">
+                <label>
                     Description
                 </label>
 
                 <textarea
-                    id="description"
                     name="description"
-                    placeholder="Write a short description..."
+                    placeholder="Movie description..."
                 ></textarea>
 
             </div>
 
 
-
-            <!-- MOVIE FILE -->
-
             <div class="form-group full">
 
-                <label for="movie_file">
-                    🎥 Movie File
+                <label>
+                    🎥 Movie File *
                 </label>
 
                 <input
-                    id="movie_file"
                     type="file"
                     name="movie_file"
-                    accept=".mp4,.webm,.ogg,.m4v"
+                    id="movieFile"
+                    accept=".mp4,.webm,.m4v,.ogg"
+                    required
                 >
 
-                <span class="form-help">
-                    Supported: MP4, WebM, OGG, M4V
-                </span>
+                <small id="movieName">
+                    No movie selected
+                </small>
 
             </div>
 
-
-
-            <!-- SUBMIT -->
 
             <div class="form-group full">
 
                 <button
                     type="submit"
-                    class="add-button"
+                    id="uploadButton"
+                    class="upload-button"
                 >
                     🎬 Upload Movie
                 </button>
@@ -245,32 +212,45 @@
 
         </form>
 
+
+        <div class="upload-info">
+
+            <strong>Large upload:</strong>
+
+            Maximum Flask request size is 5 GB.
+
+            Large files may take a long time to upload.
+
+        </div>
+
     </section>
 
 
 
-    <!-- MOVIE LIST -->
+    <!-- MOVIES -->
 
     <section class="admin-card">
 
         <h2>
-            📚 Your Movies
+            📚 Uploaded Movies
         </h2>
 
 
         {% if movies %}
 
+
         <div class="admin-movie-list">
+
 
             {% for movie in movies %}
 
-            <div class="admin-movie-item">
+
+            <div class="admin-movie">
 
 
                 {% if movie['poster'] %}
 
                 <img
-                    class="admin-movie-poster"
                     src="{{ url_for(
                         'serve_poster',
                         filename=movie['poster']
@@ -280,7 +260,7 @@
 
                 {% else %}
 
-                <div class="admin-movie-poster no-poster">
+                <div class="admin-poster-placeholder">
                     🎬
                 </div>
 
@@ -308,45 +288,70 @@
                 </div>
 
 
-                <a
-                    href="{{ url_for(
-                        'movie_details',
-                        movie_id=movie['id']
-                    ) }}"
-                    class="secondary-button"
-                >
-                    View
-                </a>
+                <div class="admin-movie-actions">
 
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'delete_movie',
-                        movie_id=movie['id']
-                    ) }}"
-                    onsubmit="return confirm(
-                        'Delete this movie?'
-                    );"
-                >
-
-                    <button
-                        type="submit"
-                        class="delete-button"
+                    <a
+                        href="{{ url_for(
+                            'movie_details',
+                            movie_id=movie['id']
+                        ) }}"
+                        class="view-button"
                     >
-                        🗑️ Delete
-                    </button>
+                        ▶ View
+                    </a>
 
-                </form>
 
+                    {% if movie['movie_file'] %}
+
+                    <a
+                        href="{{ url_for(
+                            'serve_video',
+                            filename=movie['movie_file']
+                        ) }}"
+                        class="download-button"
+                        download
+                    >
+                        ⬇ Download
+                    </a>
+
+                    {% endif %}
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'delete_movie',
+                            movie_id=movie['id']
+                        ) }}"
+                        onsubmit="return confirm(
+                            'Delete this movie?'
+                        );"
+                    >
+
+                        <button
+                            type="submit"
+                            class="delete-button"
+                        >
+                            🗑 Delete
+                        </button>
+
+                    </form>
+
+
+                </div>
 
             </div>
 
+
             {% endfor %}
+
 
         </div>
 
+
         {% else %}
+
 
         <div class="empty">
 
@@ -355,14 +360,15 @@
             </div>
 
             <h3>
-                No movies yet
+                No movies uploaded
             </h3>
 
             <p>
-                Upload your first movie using the form above.
+                Upload your first movie above.
             </p>
 
         </div>
+
 
         {% endif %}
 
@@ -372,6 +378,7 @@
 </main>
 
 
+
 <footer>
 
     <p>
@@ -379,6 +386,93 @@
     </p>
 
 </footer>
+
+
+
+<script>
+
+const poster =
+    document.getElementById("poster");
+
+const movieFile =
+    document.getElementById("movieFile");
+
+const posterName =
+    document.getElementById("posterName");
+
+const movieName =
+    document.getElementById("movieName");
+
+const uploadForm =
+    document.getElementById("uploadForm");
+
+const uploadButton =
+    document.getElementById("uploadButton");
+
+
+poster.addEventListener(
+    "change",
+    function () {
+
+        if (this.files.length > 0) {
+
+            posterName.textContent =
+                this.files[0].name;
+
+        } else {
+
+            posterName.textContent =
+                "No poster selected";
+
+        }
+
+    }
+);
+
+
+movieFile.addEventListener(
+    "change",
+    function () {
+
+        if (this.files.length > 0) {
+
+            const file =
+                this.files[0];
+
+            const gb =
+                file.size /
+                (1024 * 1024 * 1024);
+
+            movieName.textContent =
+                file.name +
+                " — " +
+                gb.toFixed(2) +
+                " GB";
+
+        } else {
+
+            movieName.textContent =
+                "No movie selected";
+
+        }
+
+    }
+);
+
+
+uploadForm.addEventListener(
+    "submit",
+    function () {
+
+        uploadButton.disabled = true;
+
+        uploadButton.textContent =
+            "⏳ Uploading... Please wait";
+
+    }
+);
+
+</script>
 
 
 </body>

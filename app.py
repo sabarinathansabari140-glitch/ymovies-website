@@ -1,8 +1,8 @@
 import os
 import sqlite3
 import secrets
-from functools import wraps
 from pathlib import Path
+from functools import wraps
 
 from flask import (
     Flask,
@@ -11,26 +11,25 @@ from flask import (
     redirect,
     url_for,
     session,
-    send_from_directory,
     abort,
+    send_from_directory
 )
+
 from werkzeug.utils import secure_filename
 
 
 # =========================================================
-# APP CONFIGURATION
+# FLASK APP
 # =========================================================
 
 app = Flask(__name__)
 
-# IMPORTANT:
-# On Render, create SECRET_KEY as an environment variable.
 app.secret_key = os.environ.get(
     "SECRET_KEY",
     "change-this-secret-key"
 )
 
-# Maximum upload size = 5 GB
+# Maximum upload request = 5 GB
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024 * 1024
 
 
@@ -49,10 +48,20 @@ POSTER_DIR = UPLOAD_DIR / "posters"
 MOVIE_DIR = UPLOAD_DIR / "movies"
 
 
-# Create directories automatically
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-POSTER_DIR.mkdir(parents=True, exist_ok=True)
-MOVIE_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+POSTER_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+MOVIE_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
 
 DATABASE = DATA_DIR / "movies.db"
@@ -62,18 +71,18 @@ DATABASE = DATA_DIR / "movies.db"
 # ALLOWED FILE TYPES
 # =========================================================
 
-ALLOWED_POSTER_EXTENSIONS = {
+ALLOWED_POSTERS = {
     "jpg",
     "jpeg",
     "png",
-    "webp",
+    "webp"
 }
 
-ALLOWED_MOVIE_EXTENSIONS = {
+ALLOWED_MOVIES = {
     "mp4",
     "webm",
-    "ogg",
     "m4v",
+    "ogg"
 }
 
 
@@ -113,7 +122,8 @@ def create_database():
 
             movie_file TEXT,
 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP
+                DEFAULT CURRENT_TIMESTAMP
 
         )
     """)
@@ -122,10 +132,6 @@ def create_database():
 
     connection.close()
 
-
-# =========================================================
-# DATABASE MIGRATION
-# =========================================================
 
 def migrate_database():
 
@@ -141,11 +147,17 @@ def migrate_database():
     }
 
     required_columns = {
+
         "year": "TEXT",
+
         "genre": "TEXT",
+
         "description": "TEXT",
+
         "poster": "TEXT",
-        "movie_file": "TEXT",
+
+        "movie_file": "TEXT"
+
     }
 
     for column_name, column_type in required_columns.items():
@@ -164,13 +176,12 @@ def migrate_database():
     connection.close()
 
 
-# Create/migrate database when app starts
 create_database()
 migrate_database()
 
 
 # =========================================================
-# ADMIN SETTINGS
+# ADMIN LOGIN
 # =========================================================
 
 def get_admin_username():
@@ -188,10 +199,6 @@ def get_admin_password():
         "admin123"
     )
 
-
-# =========================================================
-# ADMIN LOGIN CHECK
-# =========================================================
 
 def admin_required(function):
 
@@ -216,10 +223,13 @@ def admin_required(function):
 
 
 # =========================================================
-# FILE HELPERS
+# FILE FUNCTIONS
 # =========================================================
 
-def allowed_file(filename, allowed_extensions):
+def allowed_file(
+    filename,
+    extensions
+):
 
     if not filename:
         return False
@@ -227,43 +237,46 @@ def allowed_file(filename, allowed_extensions):
     if "." not in filename:
         return False
 
-    extension = filename.rsplit(
-        ".",
-        1
-    )[1].lower()
+    extension = (
+        filename
+        .rsplit(".", 1)[1]
+        .lower()
+    )
 
-    return extension in allowed_extensions
+    return extension in extensions
 
 
-def create_safe_filename(filename):
+def make_unique_filename(filename):
 
-    original_name = secure_filename(
+    safe_name = secure_filename(
         filename
     )
 
-    if not original_name:
-
+    if not safe_name:
         return None
 
-    random_name = secrets.token_hex(12)
-
-    extension = ""
-
-    if "." in original_name:
+    if "." in safe_name:
 
         extension = (
             "."
-            + original_name.rsplit(
+            + safe_name.rsplit(
                 ".",
                 1
             )[1].lower()
         )
 
-    return random_name + extension
+    else:
+
+        extension = ""
+
+    return (
+        secrets.token_hex(16)
+        + extension
+    )
 
 
 # =========================================================
-# HOME PAGE
+# HOME
 # =========================================================
 
 @app.route("/")
@@ -282,15 +295,17 @@ def home():
             """
             SELECT *
             FROM movies
+
             WHERE title LIKE ?
                OR genre LIKE ?
                OR year LIKE ?
+
             ORDER BY id DESC
             """,
             (
                 f"%{search}%",
                 f"%{search}%",
-                f"%{search}%",
+                f"%{search}%"
             )
         ).fetchall()
 
@@ -323,7 +338,6 @@ def home():
 )
 def login():
 
-    # Already logged in
     if session.get(
         "admin_logged_in",
         False
@@ -347,24 +361,10 @@ def login():
             ""
         )
 
-        correct_username = (
-            get_admin_username()
-        )
-
-        correct_password = (
-            get_admin_password()
-        )
-
         if (
-            secrets.compare_digest(
-                username,
-                correct_username
-            )
+            username == get_admin_username()
             and
-            secrets.compare_digest(
-                password,
-                correct_password
-            )
+            password == get_admin_password()
         ):
 
             session.clear()
@@ -377,9 +377,7 @@ def login():
                 url_for("admin")
             )
 
-        error = (
-            "Incorrect username or password."
-        )
+        error = "Incorrect username or password."
 
     return render_template(
         "login.html",
@@ -458,130 +456,138 @@ def add_movie():
         ""
     ).strip()
 
-    poster_file = request.files.get(
-        "poster"
-    )
-
-    movie_file = request.files.get(
-        "movie_file"
-    )
-
-    # -----------------------------------------
-    # TITLE CHECK
-    # -----------------------------------------
 
     if not title:
 
-        return redirect(
-            url_for(
-                "admin",
-                error="Movie title is required."
-            )
+        return (
+            "Movie title is required.",
+            400
         )
 
 
-    # -----------------------------------------
+    # -----------------------------------------------------
     # POSTER
-    # -----------------------------------------
+    # -----------------------------------------------------
 
     poster_filename = None
 
-    if poster_file:
+    poster = request.files.get(
+        "poster"
+    )
 
-        if poster_file.filename:
+    if poster and poster.filename:
 
-            if not allowed_file(
-                poster_file.filename,
-                ALLOWED_POSTER_EXTENSIONS
-            ):
+        if not allowed_file(
+            poster.filename,
+            ALLOWED_POSTERS
+        ):
 
-                return redirect(
-                    url_for(
-                        "admin",
-                        error=(
-                            "Invalid poster format."
-                        )
-                    )
-                )
-
-            poster_filename = (
-                create_safe_filename(
-                    poster_file.filename
-                )
+            return (
+                "Invalid poster. "
+                "Use JPG, JPEG, PNG or WEBP.",
+                400
             )
 
-            if not poster_filename:
+        poster_filename = make_unique_filename(
+            poster.filename
+        )
 
-                return redirect(
-                    url_for(
-                        "admin",
-                        error=(
-                            "Invalid poster filename."
-                        )
-                    )
-                )
+        if not poster_filename:
 
-            poster_file.save(
-                str(
-                    POSTER_DIR
-                    / poster_filename
-                )
+            return (
+                "Invalid poster filename.",
+                400
             )
 
+        poster_path = (
+            POSTER_DIR
+            / poster_filename
+        )
 
-    # -----------------------------------------
-    # MOVIE FILE
-    # -----------------------------------------
+        poster.save(
+            str(poster_path)
+        )
+
+
+    # -----------------------------------------------------
+    # MOVIE
+    # -----------------------------------------------------
 
     movie_filename = None
 
-    if movie_file:
+    movie = request.files.get(
+        "movie_file"
+    )
 
-        if movie_file.filename:
+    if movie and movie.filename:
 
-            if not allowed_file(
-                movie_file.filename,
-                ALLOWED_MOVIE_EXTENSIONS
-            ):
+        if not allowed_file(
+            movie.filename,
+            ALLOWED_MOVIES
+        ):
 
-                return redirect(
-                    url_for(
-                        "admin",
-                        error=(
-                            "Invalid movie format. "
-                            "Use MP4, WebM, OGG or M4V."
-                        )
-                    )
-                )
-
-            movie_filename = (
-                create_safe_filename(
-                    movie_file.filename
-                )
+            return (
+                "Invalid movie format. "
+                "Use MP4, WebM, M4V or OGG.",
+                400
             )
 
-            if not movie_filename:
+        movie_filename = make_unique_filename(
+            movie.filename
+        )
 
-                return redirect(
-                    url_for(
-                        "admin",
-                        error=(
-                            "Invalid movie filename."
-                        )
-                    )
-                )
+        if not movie_filename:
 
-            movie_file.save(
-                str(
-                    MOVIE_DIR
-                    / movie_filename
-                )
+            return (
+                "Invalid movie filename.",
+                400
             )
 
+        movie_path = (
+            MOVIE_DIR
+            / movie_filename
+        )
 
-    # -----------------------------------------
+        try:
+
+            # Werkzeug saves the uploaded
+            # file without loading the
+            # entire movie into memory.
+
+            movie.save(
+                str(movie_path)
+            )
+
+        except Exception as error:
+
+            print(
+                "MOVIE UPLOAD ERROR:",
+                error
+            )
+
+            if movie_path.exists():
+
+                try:
+                    movie_path.unlink()
+                except OSError:
+                    pass
+
+            return (
+                "Movie upload failed.",
+                500
+            )
+
+    else:
+
+        return (
+            "Please select a movie file.",
+            400
+        )
+
+
+    # -----------------------------------------------------
     # DATABASE
-    # -----------------------------------------
+    # -----------------------------------------------------
 
     connection = get_db()
 
@@ -596,6 +602,7 @@ def add_movie():
             poster,
             movie_file
         )
+
         VALUES (?, ?, ?, ?, ?, ?)
         """,
         (
@@ -612,13 +619,14 @@ def add_movie():
 
     connection.close()
 
+
     return redirect(
         url_for("admin")
     )
 
 
 # =========================================================
-# MOVIE DETAILS
+# MOVIE PAGE
 # =========================================================
 
 @app.route(
@@ -678,9 +686,7 @@ def delete_movie(movie_id):
         abort(404)
 
 
-    # -----------------------------------------
-    # DELETE POSTER FILE
-    # -----------------------------------------
+    # Delete poster
 
     if movie["poster"]:
 
@@ -693,14 +699,11 @@ def delete_movie(movie_id):
 
             try:
                 poster_path.unlink()
-
             except OSError:
                 pass
 
 
-    # -----------------------------------------
-    # DELETE MOVIE FILE
-    # -----------------------------------------
+    # Delete movie
 
     if movie["movie_file"]:
 
@@ -713,14 +716,9 @@ def delete_movie(movie_id):
 
             try:
                 movie_path.unlink()
-
             except OSError:
                 pass
 
-
-    # -----------------------------------------
-    # DELETE DATABASE RECORD
-    # -----------------------------------------
 
     connection.execute(
         """
@@ -740,22 +738,7 @@ def delete_movie(movie_id):
 
 
 # =========================================================
-# SERVE MOVIE FILES
-# =========================================================
-
-@app.route(
-    "/videos/<path:filename>"
-)
-def serve_video(filename):
-
-    return send_from_directory(
-        MOVIE_DIR,
-        filename
-    )
-
-
-# =========================================================
-# SERVE POSTER FILES
+# POSTER
 # =========================================================
 
 @app.route(
@@ -770,61 +753,101 @@ def serve_poster(filename):
 
 
 # =========================================================
-# 404
+# VIDEO
 # =========================================================
 
-@app.errorhandler(404)
-def page_not_found(error):
+@app.route(
+    "/videos/<path:filename>"
+)
+def serve_video(filename):
 
-    return render_template(
-        "404.html"
-    ), 404
-
-
-# =========================================================
-# 413 - FILE TOO LARGE
-# =========================================================
-
-@app.errorhandler(413)
-def file_too_large(error):
-
-    return (
-        """
-        <h1>File too large</h1>
-        <p>
-        The maximum upload size is 5 GB.
-        </p>
-        """,
-        413
+    return send_from_directory(
+        MOVIE_DIR,
+        filename,
+        conditional=True
     )
 
 
 # =========================================================
-# 500
-# =========================================================
-
-@app.errorhandler(500)
-def server_error(error):
-
-    return (
-        """
-        <h1>Server error</h1>
-        <p>
-        Something went wrong on the server.
-        </p>
-        """,
-        500
-    )
-
-
-# =========================================================
-# HEALTH CHECK
+# TEST
 # =========================================================
 
 @app.route("/test")
 def test():
 
-    return "MyMovies Flask website is working!"
+    return "MyMovies server is working!"
+
+
+# =========================================================
+# FILE TOO LARGE
+# =========================================================
+
+@app.errorhandler(413)
+def file_too_large(error):
+
+    return """
+    <html>
+
+    <head>
+        <title>File Too Large</title>
+    </head>
+
+    <body style="
+        font-family:Arial;
+        text-align:center;
+        padding:60px;
+    ">
+
+        <h1>File Too Large</h1>
+
+        <p>
+            The maximum Flask upload size is 5 GB.
+        </p>
+
+        <a href="/admin">
+            ← Back to Admin
+        </a>
+
+    </body>
+
+    </html>
+    """, 413
+
+
+# =========================================================
+# NOT FOUND
+# =========================================================
+
+@app.errorhandler(404)
+def page_not_found(error):
+
+    return """
+    <html>
+
+    <head>
+        <title>Not Found</title>
+    </head>
+
+    <body style="
+        font-family:Arial;
+        text-align:center;
+        padding:60px;
+    ">
+
+        <h1>404</h1>
+
+        <p>
+            Page not found.
+        </p>
+
+        <a href="/">
+            ← Back Home
+        </a>
+
+    </body>
+
+    </html>
+    """, 404
 
 
 # =========================================================
