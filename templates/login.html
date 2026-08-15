@@ -19,18 +19,24 @@
 
 </head>
 
+
 <body>
+
 
 <header class="navbar">
 
-    <div class="logo">
+    <a
+        href="{{ url_for('home') }}"
+        class="logo"
+    >
         🎬 MyMovies
-    </div>
+    </a>
+
 
     <nav>
 
         <a href="{{ url_for('home') }}">
-            Home
+            🏠 Home
         </a>
 
     </nav>
@@ -38,17 +44,22 @@
 </header>
 
 
+
 <main class="login-container">
 
+
     <div class="login-card">
+
 
         <div class="login-icon">
             🔐
         </div>
 
+
         <h1>
             Admin Login
         </h1>
+
 
         <p class="login-subtitle">
             Sign in to manage your movies
@@ -69,6 +80,7 @@
             action="{{ url_for('login') }}"
         >
 
+
             <label for="username">
                 Username
             </label>
@@ -78,9 +90,10 @@
                 type="text"
                 name="username"
                 placeholder="Enter username"
-                required
                 autocomplete="username"
+                required
             >
+
 
 
             <label for="password">
@@ -92,9 +105,10 @@
                 type="password"
                 name="password"
                 placeholder="Enter password"
-                required
                 autocomplete="current-password"
+                required
             >
+
 
 
             <button
@@ -103,6 +117,7 @@
             >
                 🔑 Login
             </button>
+
 
         </form>
 
@@ -114,7 +129,9 @@
             ← Back to Home
         </a>
 
+
     </div>
+
 
 </main>
 
@@ -127,6 +144,6 @@
 
 </footer>
 
-</body>
 
+</body>
 </html>

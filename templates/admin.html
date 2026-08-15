@@ -1,54 +1,385 @@
-<form
-    method="POST"
-    action="{{ url_for('add_movie') }}"
-    enctype="multipart/form-data"
->
+<!DOCTYPE html>
+<html lang="en">
 
-    <input
-        type="text"
-        name="title"
-        placeholder="Movie title"
-        required
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
 
-    <input
-        type="text"
-        name="year"
-        placeholder="Year"
+    <title>Admin Dashboard - MyMovies</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
     >
 
-    <input
-        type="text"
-        name="genre"
-        placeholder="Genre"
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <a
+        href="{{ url_for('home') }}"
+        class="logo"
     >
+        🎬 MyMovies
+    </a>
 
-    <textarea
-        name="description"
-        placeholder="Movie description"
-    ></textarea>
 
-    <label>Poster</label>
+    <nav>
 
-    <input
-        type="file"
-        name="poster"
-        accept=".jpg,.jpeg,.png,.webp"
-    >
+        <a href="{{ url_for('home') }}">
+            🏠 Home
+        </a>
 
-    <label>Movie</label>
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
+        </a>
 
-    <input
-        type="file"
-        name="movie_file"
-        accept=".mp4,.webm,.ogg,.m4v"
-    >
+    </nav>
 
-    <button
-        type="submit"
-        class="add-button"
-    >
-        🎬 Add Movie
-    </button>
+</header>
 
-</form>
+
+<main class="admin-container">
+
+
+    <!-- ADMIN HEADER -->
+
+    <section class="admin-header">
+
+        <div>
+
+            <h1>
+                👨‍💼 Admin Dashboard
+            </h1>
+
+            <p>
+                Add and manage your movies
+            </p>
+
+        </div>
+
+
+        <div class="admin-actions">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="secondary-button"
+            >
+                🏠 View Website
+            </a>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="secondary-button"
+            >
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- UPLOAD MOVIE -->
+
+    <section class="admin-card">
+
+        <h2>
+            🎬 Add New Movie
+        </h2>
+
+
+        <form
+            class="movie-form"
+            method="POST"
+            action="{{ url_for('add_movie') }}"
+            enctype="multipart/form-data"
+        >
+
+
+            <!-- TITLE -->
+
+            <div class="form-group">
+
+                <label for="title">
+                    Movie Title *
+                </label>
+
+                <input
+                    id="title"
+                    type="text"
+                    name="title"
+                    placeholder="Enter movie title"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- YEAR -->
+
+            <div class="form-group">
+
+                <label for="year">
+                    Year
+                </label>
+
+                <input
+                    id="year"
+                    type="text"
+                    name="year"
+                    placeholder="2026"
+                >
+
+            </div>
+
+
+
+            <!-- GENRE -->
+
+            <div class="form-group">
+
+                <label for="genre">
+                    Genre
+                </label>
+
+                <input
+                    id="genre"
+                    type="text"
+                    name="genre"
+                    placeholder="Action, Comedy..."
+                >
+
+            </div>
+
+
+
+            <!-- POSTER -->
+
+            <div class="form-group">
+
+                <label for="poster">
+                    🖼️ Movie Poster
+                </label>
+
+                <input
+                    id="poster"
+                    type="file"
+                    name="poster"
+                    accept=".jpg,.jpeg,.png,.webp"
+                >
+
+                <span class="form-help">
+                    JPG, PNG or WEBP
+                </span>
+
+            </div>
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Write a short description..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- MOVIE FILE -->
+
+            <div class="form-group full">
+
+                <label for="movie_file">
+                    🎥 Movie File
+                </label>
+
+                <input
+                    id="movie_file"
+                    type="file"
+                    name="movie_file"
+                    accept=".mp4,.webm,.ogg,.m4v"
+                >
+
+                <span class="form-help">
+                    Supported: MP4, WebM, OGG, M4V
+                </span>
+
+            </div>
+
+
+
+            <!-- SUBMIT -->
+
+            <div class="form-group full">
+
+                <button
+                    type="submit"
+                    class="add-button"
+                >
+                    🎬 Upload Movie
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </section>
+
+
+
+    <!-- MOVIE LIST -->
+
+    <section class="admin-card">
+
+        <h2>
+            📚 Your Movies
+        </h2>
+
+
+        {% if movies %}
+
+        <div class="admin-movie-list">
+
+            {% for movie in movies %}
+
+            <div class="admin-movie-item">
+
+
+                {% if movie['poster'] %}
+
+                <img
+                    class="admin-movie-poster"
+                    src="{{ url_for(
+                        'serve_poster',
+                        filename=movie['poster']
+                    ) }}"
+                    alt="{{ movie['title'] }}"
+                >
+
+                {% else %}
+
+                <div class="admin-movie-poster no-poster">
+                    🎬
+                </div>
+
+                {% endif %}
+
+
+                <div class="admin-movie-info">
+
+                    <h3>
+                        {{ movie['title'] }}
+                    </h3>
+
+                    <p>
+
+                        {% if movie['year'] %}
+                            {{ movie['year'] }}
+                        {% endif %}
+
+                        {% if movie['genre'] %}
+                            • {{ movie['genre'] }}
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{{ url_for(
+                        'movie_details',
+                        movie_id=movie['id']
+                    ) }}"
+                    class="secondary-button"
+                >
+                    View
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'delete_movie',
+                        movie_id=movie['id']
+                    ) }}"
+                    onsubmit="return confirm(
+                        'Delete this movie?'
+                    );"
+                >
+
+                    <button
+                        type="submit"
+                        class="delete-button"
+                    >
+                        🗑️ Delete
+                    </button>
+
+                </form>
+
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                🎬
+            </div>
+
+            <h3>
+                No movies yet
+            </h3>
+
+            <p>
+                Upload your first movie using the form above.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        © 2026 MyMovies Admin
+    </p>
+
+</footer>
+
+
+</body>
+</html>
